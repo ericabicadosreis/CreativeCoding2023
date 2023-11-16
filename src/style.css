@@ -13,6 +13,7 @@ img {
 
 #output {
     position: relative;
+    bottom: 20px;
     font-family: 'Roboto Mono', monospace; 
     font-weight: 100; 
     font-size: 12px; 
@@ -28,7 +29,7 @@ img {
 .image-container p {
     position: absolute;
     bottom: -20px;
-    right: 2%;
+    right: 1%;
     font-family: 'Roboto Mono', monospace; 
     font-weight: 100; 
     font-size: 8px; 

@@ -16,7 +16,6 @@ async function startCamera() {
                 facingMode: "environment",
                 width: 700, //larghezza ideale
                 height: 700, //altezza ideale
-                frameRate: { ideal: 10, max: 15 } 
             }
         };
         stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -26,9 +25,7 @@ async function startCamera() {
 		    // Avoid using this in new browsers
 		    video.src = window.URL.createObjectURL(stream);
 		  }
-        // video.onloadedmetadata = () => {
-        //     video.play();
-        // };
+        
     } catch (error) {
         console.error('Error accessing camera:', error);
     }

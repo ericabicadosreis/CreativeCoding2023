@@ -20,10 +20,15 @@ async function startCamera() {
             }
         };
         stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
-        video.onloadedmetadata = () => {
-            video.play();
-        };
+        if ("srcObject" in video) {
+		    video.srcObject = stream;
+		  } else {
+		    // Avoid using this in new browsers
+		    video.src = window.URL.createObjectURL(stream);
+		  }
+        // video.onloadedmetadata = () => {
+        //     video.play();
+        // };
     } catch (error) {
         console.error('Error accessing camera:', error);
     }

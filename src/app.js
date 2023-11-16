@@ -170,7 +170,7 @@ async function generateDescription(objectRecognized) {
             },
             body: JSON.stringify({
                 model: "command",
-                message: `describe the smell of these things: ${objectRecognized} in a funny way and do a text with max 100 tokens.`,
+                message: `describe the smell of these things: ${objectRecognized} in a funny way`,
                 max_tokens: 100
             }),
         });

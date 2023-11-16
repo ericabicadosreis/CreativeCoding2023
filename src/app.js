@@ -25,7 +25,7 @@ async function startCamera() {
 }
 
 //funzione per visualizzare l'immagine
-function displayCapturedImage(imgId, imgSrc, descriptionText) {
+function displayCapturedImage(imgId, imgSrc, descriptionText, captureDate) {
     const imgContainer = document.createElement('div');
     imgContainer.className = 'image-container';
 
@@ -34,29 +34,32 @@ function displayCapturedImage(imgId, imgSrc, descriptionText) {
     imgContainer.appendChild(img);
 
     const description = document.createElement('p');
-    description.textContent = descriptionText;
+    
+    const formattedDate = formatDateTime(new Date(captureDate)); // Format the date
+    description.textContent = `${formattedDate}`;
+    
     imgContainer.appendChild(description);
 
     document.getElementById('imageContainer').prepend(imgContainer);
 
     // Salva la descrizione associata all'immagine nell'array
-    imageDescriptions.push({ id: imgId, description: descriptionText });
+    imageDescriptions.push({ id: imgId, description: descriptionText, date: captureDate });
 }
 
 async function captureImage() {
-
     context.canvas.width = video.videoWidth;
     context.canvas.height = video.videoHeight;
     context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
     const imgSrc = canvas.toDataURL('image/png');
-    displayCapturedImage(capturedImages, imgSrc);
-    capturedImages.push({ id: capturedImages.length + 1, src: imgSrc });
+    const currentDate = new Date();
+    const captureDate = currentDate.toISOString(); // Format the date as a string
+   
+    displayCapturedImage(capturedImages.length + 1, imgSrc, 'Description', captureDate);
+    capturedImages.push({ id: capturedImages.length + 1, src: imgSrc, date: captureDate });
     await processImage(capturedImages.length);
 }
 
-
 async function processImage(imgId) {
-
     if (capturedImages.length === 0) {
         console.error('No images captured to process.');
         return;
@@ -68,11 +71,26 @@ async function processImage(imgId) {
     updateOutput();
 }
 
+//funzione per la visualizzazione della data e dell'ora
+function formatDateTime(date) {
+    const options = {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        hour12: false,
+    };
+    return date.toLocaleString('en-US', options).replace(',', ''); // Adjust locale as needed
+}
+
 function updateOutput() {
     const containers = document.querySelectorAll('.image-container');
     for (let i = 0; i < imageDescriptions.length; i++) {
         const description = containers[i].querySelector('p');
-        description.textContent = imageDescriptions[i].description;
+        const formattedDate = formatDateTime(new Date(imageDescriptions[i].date)); // Format the date
+        description.textContent = `${formattedDate}`;
     }
 }
 
@@ -145,7 +163,7 @@ async function generateDescription(objectRecognized) {
             },
             body: JSON.stringify({
                 model: "command",
-                message: `describe the smell of these things: ${objectRecognized}`,
+                message: `describe the smell of these things: ${objectRecognized} in a funny way and do a text with max 100 tokens.`,
                 max_tokens: 100
             }),
         });

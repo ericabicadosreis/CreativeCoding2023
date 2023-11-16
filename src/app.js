@@ -12,6 +12,7 @@ async function startCamera() {
     try {
         const constraints = {
             video: {
+                facingMode: 'environment',
                 width: 700, //larghezza ideale
                 height: 700 //altezza ideale
             }

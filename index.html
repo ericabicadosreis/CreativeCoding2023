@@ -3,18 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Object Recognition</title>
+  <title>Smell it camera</title>
+  <link rel="icon" type="image/jpg" href="src/img/favicon.ico">
+  <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
-  <h1>Object Recognition from Camera</h1>
+  <div style= 
+  "font-family: 'Roboto Mono', monospace; 
+  font-weight: 100; 
+  font-size: 30px; 
+  color:rgb(0, 0, 0)"><p>smell it camera</p></div> 
   <video id="camera" width="100%" height="auto" autoplay></video>
   <br>
-  <button onclick="captureImage()">Capture Image</button>
+  <button onclick="captureImage()" style="position: relative;
+  left: 25%;
+  width: 50%;
+  height: 100%;
+  padding: 8px;
+  border:0cap;
+  border-radius: 2em;
+  background-color: rgb(230, 230, 230);
+  font-family: 'Roboto Mono', monospace; 
+  font-weight: 100; 
+  font-size: 10px; 
+  color:rgb(0, 0, 0)">capture image</button>
   <br>
   <canvas id="canvas" width="100%" height="auto" style="display:none;"></canvas>
   <br>
-  <button onclick="processImage()">Process Image</button>
+  <div id="imageContainer"></div>
   <p id="output"></p>
+
 
   <script src="src/app.js"></script>
 

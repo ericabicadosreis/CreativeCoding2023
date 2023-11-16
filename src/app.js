@@ -13,9 +13,10 @@ async function startCamera() {
         const constraints = {
             audio: false,
             video: {
-                facingMode: { exact: "environment" },
+                facingMode: "environment",
                 width: 700, //larghezza ideale
-                height: 700 //altezza ideale
+                height: 700, //altezza ideale
+                frameRate: { ideal: 10, max: 15 } 
             }
         };
         stream = await navigator.mediaDevices.getUserMedia(constraints);

@@ -11,14 +11,18 @@ let capturedImages = []; // Array per mantenere le immagini catturate
 async function startCamera() {
     try {
         const constraints = {
+            audio: false,
             video: {
-                facingMode: 'environment',
+                facingMode: "user",
                 width: 700, //larghezza ideale
                 height: 700 //altezza ideale
             }
         };
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
+        video.onloadedmetadata = () => {
+            video.play();
+        };
     } catch (error) {
         console.error('Error accessing camera:', error);
     }

@@ -28,11 +28,11 @@ img {
 .image-container p {
     position: absolute;
     right: 8px;
-    left: 50%;
+    left: 25%;
     font-family: 'Roboto Mono', monospace; 
     text-align: left;
     hyphens: auto;
-    font-weight: 100; 
+    font-weight: lighter; 
     font-size: 15px; 
     color:rgb(0, 0, 0)
     

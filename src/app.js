@@ -50,7 +50,7 @@ function displayCapturedImage(imgId, imgSrc, descriptionText, captureDate) {
 }
 
 async function captureImage() {
-    document.querySelector("#capture").innerHTML = "Loading ..." 
+    document.querySelector("#capture").innerHTML = "loading ..." 
     context.canvas.width = video.videoWidth;
     context.canvas.height = video.videoHeight;
     context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);

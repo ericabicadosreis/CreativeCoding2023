@@ -3,10 +3,9 @@ const video = document.getElementById('camera');
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
-let imageDescriptions = []; // Array per mantenere le descrizioni
-let capturedImages = []; // Array per mantenere le immagini catturate
+let imageDescriptions = []; // Array per mantenere le immagini e le descrizioni
 
-//PARTE CAMERA
+// PARTE CAMERA
 
 async function startCamera() {
     try {
@@ -14,71 +13,58 @@ async function startCamera() {
             audio: false,
             video: {
                 facingMode: "environment",
-                width: 700, //larghezza ideale
-                height: 700, //altezza ideale
+                width: 700, // larghezza ideale
+                height: 700, // altezza ideale
             }
         };
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         if ("srcObject" in video) {
-		    video.srcObject = stream;
-		  } else {
-		    // Avoid using this in new browsers
-		    video.src = window.URL.createObjectURL(stream);
-		  }
-        
+            video.srcObject = stream;
+        } else {
+            // Avoid using this in new browsers
+            video.src = window.URL.createObjectURL(stream);
+        }
+
     } catch (error) {
         console.error('Error accessing camera:', error);
     }
 }
 
-//funzione per visualizzare l'immagine
+// Funzione per visualizzare l'immagine
 function displayCapturedImage(imgId, imgSrc, descriptionText, captureDate) {
-    const imgContainer = document.createElement('div');
-    imgContainer.className = 'image-container';
+    // Crea un oggetto che rappresenta l'immagine e la descrizione
+    const imageData = {
+        id: imgId,
+        src: imgSrc,
+        description: descriptionText,
+        date: captureDate
+    };
 
-    const img = new Image();
-    img.src = imgSrc;
-    imgContainer.appendChild(img);
-
-    const description = document.createElement('p');
-    
-    const formattedDate = formatDateTime(new Date(captureDate)); // Format the date
-    description.textContent = `${formattedDate}`;
-    
-    imgContainer.appendChild(description);
-
-    document.getElementById('imageContainer').prepend(imgContainer);
-
-    // Salva la descrizione associata all'immagine nell'array
-    imageDescriptions.push({ id: imgId, description: descriptionText, date: captureDate });
+    // Aggiungi l'oggetto all'inizio dell'array
+    imageDescriptions.unshift(imageData);
+    document.querySelector("#capture").innerHTML = "Capture image";
+    updateOutput(); // Aggiorna l'output ogni volta che viene catturata una nuova immagine
 }
 
 async function captureImage() {
+    document.querySelector("#capture").innerHTML = "Loading ..." 
     context.canvas.width = video.videoWidth;
     context.canvas.height = video.videoHeight;
     context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
     const imgSrc = canvas.toDataURL('image/png');
     const currentDate = new Date();
-    const captureDate = currentDate.toISOString(); // Format the date as a string
-   
-    displayCapturedImage(capturedImages.length + 1, imgSrc, 'Description', captureDate);
-    capturedImages.push({ id: capturedImages.length + 1, src: imgSrc, date: captureDate });
-    await processImage(capturedImages.length);
+    const captureDate = currentDate.toISOString(); // Formatta la data come stringa
+
+    
+    const objectRecognized = await detectObjectsGoogleVision(imgSrc);
+    const cohereDescription = await generateDescription(objectRecognized);
+    
+
+    displayCapturedImage(imageDescriptions.length + 1, imgSrc, cohereDescription, captureDate);
+
 }
 
-async function processImage(imgId) {
-    if (capturedImages.length === 0) {
-        console.error('No images captured to process.');
-        return;
-    }
-    const latestCapturedImage = capturedImages.find(img => img.id === imgId);
-    const base64Image = latestCapturedImage.src.split(',')[1];
-    const objectRecognized = await detectObjectsGoogleVision(base64Image);
-    generateDescription(objectRecognized);
-    updateOutput();
-}
-
-//funzione per la visualizzazione della data e dell'ora
+// Funzione per la visualizzazione della data e dell'ora
 function formatDateTime(date) {
     const options = {
         day: 'numeric',
@@ -89,24 +75,42 @@ function formatDateTime(date) {
         second: 'numeric',
         hour12: false,
     };
-    return date.toLocaleString('en-US', options).replace(',', ''); // Adjust locale as needed
+    return date.toLocaleString('en-US', options).replace(',', ''); // Regola la lingua se necessario
 }
 
 function updateOutput() {
-    const containers = document.querySelectorAll('.image-container');
+    let containers = document.getElementById('imageContainer');
+    
+    // Svuota il contenitore
+    containers.innerHTML = '';
+
+    // Aggiungi le immagini e le descrizioni nel modo corretto
     for (let i = 0; i < imageDescriptions.length; i++) {
-        const description = containers[i].querySelector('p');
-        const formattedDate = formatDateTime(new Date(imageDescriptions[i].date)); // Format the date
-        description.textContent = `${formattedDate}`;
+        const desc = imageDescriptions[i];
+
+        let imgContainer = document.createElement('div');
+        imgContainer.className = 'image-container';
+
+        const img = new Image();
+        img.src = desc.src;
+        imgContainer.appendChild(img);
+
+        const description = document.createElement('p');
+        const formattedDate = formatDateTime(new Date(desc.date));
+        description.textContent = `${formattedDate} - ${desc.description}`;
+        imgContainer.appendChild(description);
+
+        containers.appendChild(imgContainer);
     }
 }
 
-outputElement.innerHTML
+//outputElement.innerHTML
 
-async function detectObjectsGoogleVision(base64Image) {
+async function detectObjectsGoogleVision(imgSrc) {
     const apiKey = 'AIzaSyConyle9qljRMYS9VwR4a8ZlUUEoY6aRwk';
     const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
 
+    const base64Image = imgSrc.split(',')[1]; // Estrai la parte codificata in base64
 
     const requestData = {
         requests: [
@@ -148,6 +152,7 @@ async function detectObjectsGoogleVision(base64Image) {
     }
 }
 
+
 async function getBase64Image(file) {
     return new Promise((resolve) => {
         const reader = new FileReader();
@@ -161,26 +166,28 @@ async function getBase64Image(file) {
 async function generateDescription(objectRecognized) {
     let responseContainer = document.querySelector("#output")
     try {
-        responseContainer.textContent = `Loading...`;
         const response = await fetch("https://api.cohere.ai/v1/chat", {
             method: "POST",
             headers: {
-                Authorization: "Bearer x0OgpyIayfjTEiU7xWvKGJr0tBavinfLkmngNvct", // Replace with your actual API key
+                Authorization: "Bearer FfgibsqJTi4lNUGeIHBlyr5ZVbg8OeW9S872zj7k", // Sostituisci con la tua chiave API reale
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 model: "command",
-                message: `with 150 tokens describe the smell of these things: ${objectRecognized}`,
+                message: `describe the smell of these things: ${objectRecognized}`,
+                max_tokens: 200,
             }),
         });
 
         const data = await response.json();
-
-        responseContainer.textContent = `${data.text}`; // Modify based on how the response is structured
+        return data.text; // Modifica in base alla struttura della risposta
     } catch (error) {
-        responseContainer.textContent = `Error: ${error}`;
+        console.error('Errore durante la richiesta Cohere AI:', error);
+        return 'Errore nella generazione della descrizione';
     }
 }
+
+
 //inizializza la fotocamera quando la pagina di carica
 window.onload = startCamera;
 

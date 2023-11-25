@@ -25,6 +25,7 @@ img {
 
 .image-container {
     margin-top: 150px;
+    width:max-content;
 }
 
 

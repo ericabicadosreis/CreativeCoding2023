@@ -27,8 +27,8 @@ img {
 
 .image-container p {
     position: absolute;
-    right: 15px;
-    left: 15px;
+    right: 5px;
+    left: 5px;
     font-family: 'Roboto Mono', monospace; 
     font-weight: 100; 
     font-size: 8px; 

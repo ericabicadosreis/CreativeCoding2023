@@ -15,6 +15,9 @@ async function startCamera() {
                 facingMode: "environment",
                 width: 700, // larghezza ideale
                 height: 700, // altezza ideale
+                left: 0,
+                right: 0,
+
             }
         };
         stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -175,7 +178,7 @@ async function generateDescription(objectRecognized) {
             body: JSON.stringify({
                 model: "command",
                 message: `describe the smell of these things: ${objectRecognized}`,
-                max_tokens: 200,
+                max_tokens: 150,
             }),
         });
 

@@ -2,22 +2,15 @@ body {
     background-color: rgb(255, 255, 255);
 }
 
-canvas {
-    bottom: 20px;
-    width: 100%;
-}
-
 img {
     width: 100%;
-}
-
-.image-container {
-    bottom: 20px;
-    margin-top: 150px;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
 .image-container p {
     position: absolute;
+    margin-top: 10px;
     right: 8px;
     left: 25%;
     font-family: 'helvetica neue', Helvetica, sans-serif; 
@@ -30,7 +23,11 @@ img {
     
 }
 
-button {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+.image-container {
+    margin-top: 150px;
 }
+
+
+
+
 
